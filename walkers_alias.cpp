@@ -16,31 +16,37 @@
 using namespace std;
 
 int main() {
-    int arr1[] = {1, 2, 3, 4, 5, 6};
+    srand(time(NULL));
+
+    int arr1[] = {0, 1, 2, 3, 4, 5};
     int n1 = sizeof(arr1) / sizeof(arr1[0]);
     vector<int> keys(arr1, arr1 + n1);
-    double arr2[] = {0.1, 0.2, 0.3, 0.15, 0.1, 0.15};
+    double arr2[] = {0.5, 0, 2.94, 0.5, 2.94, 2.94};
     int n2 = sizeof(arr2) / sizeof(arr2[0]);
     vector<double> weights(arr2, arr2 + n2);
-
     WalkerMethod sampler(keys, weights);
-    map<int, double> samples;
-    for (int i = 0; i < keys.size(); i++){
-        samples[i+1] = 0;
-    }
 
+    vector<int> counts(6, 0);
+
+    // Generate 10000 samples and count the occurrences of each value
     for (int i = 0; i < 10000; i++) {
-        samples[sampler.random()] += 1;
+        int sample = sampler.random();
+        counts[sample]++;
+    }
+    // Calculate the expected frequencies for each value
+    //double arr3[] = {0.1, 0.2, 0.3, 0.15, 0.1, 0.15};
+    double arr3[] = {0.5, 0, 2.94, 0.5, 2.94, 2.94};
+    int n3 = sizeof(arr3) / sizeof(arr3[0]);
+    vector<double> expected_freq(arr3, arr3 + n3);
+    double norm = accumulate(expected_freq.begin(), expected_freq.end(), 0.0);
+    for (int i = 0; i < 6; i++) {
+        expected_freq[i] = expected_freq[i]*10000/norm;
     }
 
-    double ratio_ = samples[3] / samples[4];
-
-    cout << ratio_ << endl;
-
-    if(ratio_ >= 1.8 && ratio_ <= 2.2) {
-        cout << "Test passed" << endl;
-    } else {
-        cout << "Test failed" << endl;
+    // Print the results
+    cout << "Value\tCount\tExpected Frequency\n";
+    for (int i = 0; i < 6; i++) {
+        cout << i << "\t" << counts[i] << "\t" << expected_freq[i] << endl;
     }
 
     return 0;
